@@ -141,16 +141,16 @@ export async function PUT(
       JSON.stringify(items.map((x) => x.id).sort());
     if (
       ids(m.actions) !== ids(current.actions) ||
-      ids(m.decisions) !== ids(current.decisions)
+      ids(m.discussions) !== ids(current.discussions)
     )
       throw new HttpError(
         400,
         "Output identities cannot be changed during review.",
       );
     const previous = new Map(
-      [...current.actions, ...current.decisions].map((item) => [item.id, item]),
+      [...current.actions, ...current.discussions].map((item) => [item.id, item]),
     );
-    const outputs = [...m.actions, ...m.decisions];
+    const outputs = [...m.actions, ...m.discussions];
     const existingOwners = new Map(current.actions.map((item) => [item.id, item.owner]));
     if (m.actions.some((item) => item.owner && item.owner !== existingOwners.get(item.id) &&
       !current.segments.some((segment) => segment.speaker === item.owner)))
@@ -174,15 +174,15 @@ export async function PUT(
     const after = reviewContent(m);
     if (!can(a.role, "review")) {
       const acceptedActions = before.actions.filter((item) => item.approved);
-      const acceptedDecisions = before.decisions.filter(
+      const acceptedDiscussions = before.discussions.filter(
         (item) => item.approved,
       );
       if (
         reviewChanged ||
         JSON.stringify(acceptedActions) !==
           JSON.stringify(after.actions.filter((item) => item.approved)) ||
-        JSON.stringify(acceptedDecisions) !==
-          JSON.stringify(after.decisions.filter((item) => item.approved)) ||
+        JSON.stringify(acceptedDiscussions) !==
+          JSON.stringify(after.discussions.filter((item) => item.approved)) ||
         (current.reviewed && JSON.stringify(before) !== JSON.stringify(after))
       )
         throw new HttpError(

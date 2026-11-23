@@ -1214,7 +1214,7 @@ small {
   margin-left: auto;
   color: #6b90a6;
 }
-/* The review keeps decisions and their source in the same field of view. */
+/* The review keeps discussions and their source in the same field of view. */
 .detail-page {
   padding: 26px 35px 0;
   max-width: 1536px;
@@ -1377,11 +1377,11 @@ small {
   font-size: 10px;
   color: #617a89;
 }
-.decision-list {
+.discussion-list {
   display: grid;
   gap: 13px;
 }
-.decision-card {
+.discussion-card {
   border: 1px solid #e7ebee;
   border-radius: 8px;
   padding: 15px 17px 0;
@@ -1416,7 +1416,7 @@ small {
   color: #6a7880;
   background: #f6f7f8;
 }
-.decision-card h3 {
+.discussion-card h3 {
   font-size: 14px;
   line-height: 1.6;
   letter-spacing: -0.15px;
@@ -1424,7 +1424,7 @@ small {
   font-weight: 500;
   color: #6b7f8a;
 }
-.decision-card > p {
+.discussion-card > p {
   font-size: 11px;
   color: #657985;
   line-height: 1.8;
@@ -1822,7 +1822,7 @@ small {
 .collection-toolbar {
   margin: 35px 0 25px;
 }
-.decisions-grid {
+.discussions-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 25px;
@@ -1839,15 +1839,15 @@ small {
 .collection-context svg:last-child {
   margin-left: auto;
 }
-.decisions-grid .decision-card {
+.discussions-grid .discussion-card {
   height: calc(100% - 25px);
   display: flex;
   flex-direction: column;
 }
-.decisions-grid .decision-card .card-bottom {
+.discussions-grid .discussion-card .card-bottom {
   margin-top: auto;
 }
-.decisions-grid .decision-card > .evidence-links {
+.discussions-grid .discussion-card > .evidence-links {
   margin-bottom: 13px;
 }
 .collection-actions .action-row {
@@ -2595,10 +2595,10 @@ small {
   .summary-stats > span {
     font-size: 12px;
   }
-  .decision-card h3 {
+  .discussion-card h3 {
     font-size: 15px;
   }
-  .decision-card > p {
+  .discussion-card > p {
     font-size: 13px;
   }
   .evidence-links button {
@@ -2611,7 +2611,7 @@ small {
   .approve-button {
     font-size: 12px;
   }
-  .decision-card {
+  .discussion-card {
     padding: 18px 21px 0;
   }
   .transcript-title h2 {
@@ -2999,10 +2999,10 @@ small {
   .detail-tabs > button {
     font-size: 12px;
   }
-  .decision-card h3 {
+  .discussion-card h3 {
     font-size: 15px;
   }
-  .decision-card > p {
+  .discussion-card > p {
     font-size: 13px;
   }
   .evidence-links button {
@@ -3041,16 +3041,16 @@ small {
     align-items: flex-start;
     flex-direction: column;
   }
-  .decisions-grid {
+  .discussions-grid {
     gap: 18px;
   }
-  .decisions-grid .decision-card h3 {
+  .discussions-grid .discussion-card h3 {
     font-size: 14px;
   }
-  .decisions-grid .decision-card > p {
+  .discussions-grid .discussion-card > p {
     font-size: 12px;
   }
-  .decisions-grid .card-bottom {
+  .discussions-grid .card-bottom {
     gap: 9px;
     flex-wrap: wrap;
   }
@@ -3272,7 +3272,7 @@ small {
   .summary-stats > span {
     font-size: 11px;
   }
-  .decision-card {
+  .discussion-card {
     padding: 16px 18px 0;
   }
   .detail-tabs {
@@ -3358,7 +3358,7 @@ small {
   .collection-toolbar {
     margin-top: 27px;
   }
-  .decisions-grid {
+  .discussions-grid {
     gap: 20px;
   }
   .collection-context {
@@ -3602,10 +3602,10 @@ small {
   .detail-tabs > button {
     font-size: 11px;
   }
-  .decision-card h3 {
+  .discussion-card h3 {
     font-size: 14px;
   }
-  .decision-card > p {
+  .discussion-card > p {
     font-size: 12px;
   }
   .evidence-links > span {
@@ -3618,7 +3618,7 @@ small {
   .approve-button {
     font-size: 10px;
   }
-  .decision-card {
+  .discussion-card {
     padding: 14px 14px 0;
   }
   .action-row {
@@ -3652,20 +3652,20 @@ small {
   .review-footer > .text-button {
     font-size: 10px;
   }
-  .decisions-grid {
+  .discussions-grid {
     grid-template-columns: 1fr;
     gap: 23px;
   }
-  .decisions-grid .decision-card h3 {
+  .discussions-grid .discussion-card h3 {
     font-size: 15px;
   }
-  .decisions-grid .decision-card > p {
+  .discussions-grid .discussion-card > p {
     font-size: 13px;
   }
-  .decisions-grid .card-bottom .text-button {
+  .discussions-grid .card-bottom .text-button {
     font-size: 11px;
   }
-  .decisions-grid .approve-button {
+  .discussions-grid .approve-button {
     font-size: 11px;
   }
   .collection-actions .action-row {
@@ -3788,11 +3788,11 @@ small {
 }
 
 /* Readable hierarchy: color differentiates output types, while ink carries content. */
-.decision-card h3,
+.discussion-card h3,
 .action-title {
   color: #444c50;
 }
-.decision-card > p,
+.discussion-card > p,
 .summary-box > p {
   color: #79717f;
 }

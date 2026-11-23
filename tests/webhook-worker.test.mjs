@@ -508,7 +508,13 @@ test(
         await call("/api/meetings", "POST", meetingInput, admin, 201)
       ).json();
       assert.equal(meeting.source, "meetstream");
-      await call("/api/meetings", "POST", meetingInput, admin, 200);
+      const { discussions, ...stored } = meeting;
+      const database = await worker.getD1Database("DB");
+      await database.prepare("UPDATE meetings SET data=? WHERE id=?")
+        .bind(JSON.stringify({ ...stored, decisions: discussions }), meeting.id).run();
+      const duplicate = await (await call("/api/meetings", "POST", meetingInput, admin, 200)).json();
+      assert.deepEqual(duplicate.meeting.discussions, discussions);
+      assert.equal(duplicate.meeting.decisions, undefined);
       assert.deepEqual((await listBots(admin)).bots.map((bot) => [bot.id, bot.meetingId]).sort(), [
         [botId, meeting.id], [secondBotId, null],
       ]);
@@ -517,7 +523,7 @@ test(
       assert.equal(botEvents.filter((event) => event.action === "meetstream.bot.stop_requested").length, 1);
       assert.equal(meeting.segments[0].speaker, "Alex");
       assert.equal(meeting.segments[0].start, 1);
-      assert.ok(meeting.decisions.length);
+      assert.ok(meeting.discussions.length);
       assert.ok(meeting.actions.length);
       const path = "/api/meetings/" + meeting.id;
       const meetingIndex = await (await call("/api/workspace", "GET", null, admin, 200)).json();
@@ -567,8 +573,8 @@ test(
           {
             ...meeting,
             reviewed: true,
-            decisions: meeting.decisions.map((decision) => ({
-              ...decision,
+            discussions: meeting.discussions.map((discussion) => ({
+              ...discussion,
               approved: true,
             })),
           },
@@ -611,7 +617,7 @@ test(
       assert.equal(event.id, sent.deliveries[0].id);
       assert.equal(event.id, headers.get("X-Trace-Delivery"));
       assert.equal(event.meeting.revision, reviewed.revision);
-      assert.deepEqual(event.decisions, reviewed.decisions);
+      assert.deepEqual(event.discussions, reviewed.discussions);
       assert.deepEqual(event.actions, []);
       assert.ok(event.evidence.length);
       for (const segment of event.evidence) {
@@ -619,8 +625,8 @@ test(
         assert.equal(evidence.origin, base.origin);
         assert.equal(evidence.searchParams.get("segment"), segment.id);
         assert.ok(
-          reviewed.decisions.some((decision) =>
-            decision.evidence.includes(segment.id),
+          reviewed.discussions.some((discussion) =>
+            discussion.evidence.includes(segment.id),
           ),
         );
       }

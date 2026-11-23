@@ -98,7 +98,7 @@ const architecture: Meeting = {
       text: "That gives us clear next steps: pagination specification, the cache implementation, integration tests, and the rollout plan. Let’s review the drafts before creating the issues.",
     },
   ],
-  decisions: [
+  discussions: [
     {
       id: "d1",
       title: "Use cursor-based pagination for API v2",
@@ -196,7 +196,7 @@ function secondary(
   project: string,
   date: string,
   summary: string,
-  decision: string,
+  discussion: string,
   action: string,
   speaker: string,
   platform: Meeting["platform"],
@@ -219,7 +219,7 @@ function secondary(
         speaker,
         start: 110,
         end: 155,
-        text: `We decided to ${decision.toLowerCase()}.`,
+        text: `We decided to ${discussion.toLowerCase()}.`,
       },
       {
         id: "s2",
@@ -229,10 +229,10 @@ function secondary(
         text: `I’ll ${action.toLowerCase()}.`,
       },
     ],
-    decisions: [
+    discussions: [
       {
         id: "d1",
-        title: decision,
+        title: discussion,
         context: summary,
         rationale: "Agreed by the team during the discussion.",
         consequences: "Review implementation progress at the next sync.",

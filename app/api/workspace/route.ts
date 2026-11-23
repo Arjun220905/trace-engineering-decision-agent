@@ -1,7 +1,7 @@
 import { integrationStates } from "@/lib/integration-service";
 import { defaultPreferences } from "@/lib/preferences";
 import { db, access, failure, getDeliveries } from "@/lib/server";
-import { meetingPreview, type Meeting } from "@/lib/types";
+import { meetingPreview, readStoredMeeting } from "@/lib/types";
 import { can } from "@/lib/access";
 export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
@@ -29,7 +29,7 @@ export async function GET(req: Request) {
       {
         meetings: rows.results
           .map(
-            (r) => meetingPreview({ ...JSON.parse(r.data), revision: r.revision } as Meeting),
+            (r) => meetingPreview(readStoredMeeting(r.data, r.revision)),
           )
           .sort((a, b) => b.date.localeCompare(a.date)),
         deliveries: await getDeliveries(owner),

@@ -89,7 +89,7 @@ export async function findDeliveredIssue(
             Authorization: `Bearer ${config.GITHUB_TOKEN}`,
             Accept: "application/vnd.github+json",
             "X-GitHub-Api-Version": "2022-11-28",
-            "User-Agent": "Trace-Decision-Agent",
+            "User-Agent": "Trace-Discussion-Agent",
           },
         });
         const nodes = githubIssues.parse(await readResponseJson(response, 8 * 1024 * 1024));

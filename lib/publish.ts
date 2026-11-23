@@ -44,11 +44,11 @@ export function planDeliveries(m: Meeting, destinations: Destination[]) {
         (destination === "linear" ? a.linearFollowup?.kind !== "ambiguous" : !a.linearFollowup)))
         plan.push({ itemId: a.id, destination });
     if (destination === "notion")
-      for (const d of m.decisions.filter((d) => d.approved))
+      for (const d of m.discussions.filter((d) => d.approved))
         plan.push({ itemId: d.id, destination });
     if (
       (destination === "slack" || destination === "webhook") &&
-      [...m.decisions, ...m.actions].some((x) => x.approved)
+      [...m.discussions, ...m.actions].some((x) => x.approved)
     )
       plan.push({ itemId: "summary", destination });
   }
@@ -60,8 +60,8 @@ export function slackPayload(m: Meeting, origin: string) {
   const link = (id: string) =>
     `<${evidenceUrl(origin, m, id)}|${time(m.segments.find((s) => s.id === id)!.start)} evidence>`;
   const lines = [
-    "*Decisions*",
-    ...m.decisions
+    "*Discussions*",
+    ...m.discussions
       .filter((d) => d.approved)
       .map((d) => `• ${escape(d.title)} · ${link(d.evidence[0])}`),
     "",
@@ -205,10 +205,10 @@ export async function deliver(
   if (destination === "webhook") {
     if (!deliveryId) throw new Error("Missing delivery ID.");
     const timestamp = String(Math.floor(Date.now() / 1000));
-    const decisions = m.decisions.filter((item) => item.approved);
+    const discussions = m.discussions.filter((item) => item.approved);
     const actions = m.actions.filter((item) => item.approved);
     const evidence = new Set(
-      [...decisions, ...actions].flatMap((item) => item.evidence),
+      [...discussions, ...actions].flatMap((item) => item.evidence),
     );
     const body = JSON.stringify({
       event: "meeting.reviewed",
@@ -219,7 +219,7 @@ export async function deliver(
         revision: m.revision,
         url: origin + meetingPath(m.id),
       },
-      decisions,
+      discussions,
       actions,
       evidence: m.segments
         .filter((s) => evidence.has(s.id))
@@ -349,7 +349,7 @@ export async function deliver(
           "Content-Type": "application/json",
           Accept: "application/vnd.github+json",
           "X-GitHub-Api-Version": "2022-11-28",
-          "User-Agent": "Trace-Decision-Agent",
+          "User-Agent": "Trace-Discussion-Agent",
         },
         body: JSON.stringify({
           title: a.title,
@@ -395,7 +395,7 @@ export async function deliver(
       );
     return "";
   }
-  const d = m.decisions.find((d) => d.id === itemId)!;
+  const d = m.discussions.find((d) => d.id === itemId)!;
   const markdown = adrMarkdown(m, d, origin, (text) => text);
   const chunks = markdown.match(/[\s\S]{1,1800}/g) || [];
   const r = await request("https://api.notion.com/v1/pages", {

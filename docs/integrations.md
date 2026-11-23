@@ -45,7 +45,7 @@ Saving validates the URL format and stores it; it does not send a test message. 
 
 ## Notion
 
-Share a parent page with a Notion integration. Paste the integration key and parent page link or ID in Trace. Saving checks read access to the page. Publishing creates one child ADR page per accepted decision. The complete ADR Markdown is stored as bounded text blocks rather than claiming native Markdown-to-Notion formatting.
+Share a parent page with a Notion integration. Paste the integration key and parent page link or ID in Trace. Saving checks read access to the page. Publishing creates one child ADR page per accepted discussion. The complete ADR Markdown is stored as bounded text blocks rather than claiming native Markdown-to-Notion formatting.
 
 ## MeetStream and Claude
 
@@ -72,9 +72,9 @@ A connection only configures a destination. External writes still require approv
 ## Verify a real meeting locally
 
 1. Choose a real transcript and confirm its destination team, repository and Slack channel. Import it once; importing the same speaker turns again must return the existing meeting.
-2. Compare every extracted decision and action against its quoted source turn. Edit the ADR context, rationale and consequences, and check each action's owner and deadline before approval. Match those speakers to real provider accounts.
+2. Compare every extracted discussion and action against its quoted source turn. Edit the ADR context, rationale and consequences, and check each action's owner and deadline before approval. Match those speakers to real provider accounts.
 3. Open the ADR preview and each evidence link. Check the displayed timestamp, speaker and quote against the transcript. Evidence links open the source transcript turn. When a linked MeetStream recording is available, reviewers can play it from that timestamp.
-4. Publish the reviewed meeting to the selected destinations. Read the actual Linear and GitHub issues to verify assignees, descriptions, evidence and the unique `trace:` marker. Read the Slack message in the intended channel and compare its approved decisions and actions.
+4. Publish the reviewed meeting to the selected destinations. Read the actual Linear and GitHub issues to verify assignees, descriptions, evidence and the unique `trace:` marker. Read the Slack message in the intended channel and compare its approved discussions and actions.
 5. Publish the unchanged meeting again. Every existing delivery should be skipped. Count the actual provider issues and Slack messages with the same markers: one per approved action per selected tracker, and one Slack summary. A `pending` or `uncertain` delivery requires checking the provider before reconciliation; never delete its claim just to retry.
 
 With the app on localhost, evidence links work on this computer. Other recipients need access to the same running app to follow them. No deployment is required for the local acceptance test.

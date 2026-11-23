@@ -143,7 +143,7 @@ export default function Login({ next }: { next: string }) {
             </span>
             <span>
               <GitBranch size={18} />
-              Decisions with evidence
+              Discussions with evidence
             </span>
             <span>
               <ListTodo size={18} />A next step with an owner

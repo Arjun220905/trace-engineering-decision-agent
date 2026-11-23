@@ -14,7 +14,7 @@ import {
   HttpError,
 } from "@/lib/server";
 import { extract, parseTranscript } from "@/lib/extract";
-import { meetingSchema } from "@/lib/types";
+import { meetingSchema, readStoredMeeting } from "@/lib/types";
 const providerId = z
   .string()
   .trim()
@@ -85,7 +85,7 @@ export async function POST(req: Request) {
     if (existing) {
       if (linkBot) await linkBot.run();
       return Response.json({
-        meeting: { ...JSON.parse(existing.data), revision: existing.revision },
+        meeting: readStoredMeeting(existing.data, existing.revision),
         duplicate: true,
       });
     }
@@ -141,7 +141,7 @@ export async function POST(req: Request) {
         .bind(owner, hash)
         .first<{ data: string; revision: number }>();
       return Response.json({
-        meeting: { ...JSON.parse(row!.data), revision: row!.revision },
+        meeting: readStoredMeeting(row!.data, row!.revision),
         duplicate: true,
       });
     }

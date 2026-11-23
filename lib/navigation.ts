@@ -1,6 +1,6 @@
 export const workspaceViews = [
   "meetings",
-  "decisions",
+  "discussions",
   "actions",
   "integrations",
   "settings",
@@ -12,7 +12,7 @@ export function workspaceRoute(
 ): { view: WorkspaceView; meetingId: string | null } | null {
   const parts = pathname.replace(/\/$/, "").split("/").filter(Boolean);
   if (parts[0] !== "workspace") return null;
-  const view = parts[1] || "meetings";
+  const view = parts[1] === "decisions" ? "discussions" : parts[1] || "meetings";
   if (!workspaceViews.includes(view as WorkspaceView)) return null;
   if (parts.length > 2 && (view !== "meetings" || parts.length !== 3))
     return null;
@@ -35,7 +35,8 @@ export function canonicalWorkspacePath(parts?: string[]) {
     "/workspace/" +
     (parts?.length
       ? parts
-          .map((part) => {
+          .map((part, index) => {
+            if (index === 0 && part === "decisions") return "discussions";
             try {
               return encodeURIComponent(decodeURIComponent(part));
             } catch {

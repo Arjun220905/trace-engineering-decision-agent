@@ -49,7 +49,7 @@ export function IntegrationsPage({
       <div className="page-heading">
         <div>
           <h1>Connect your workflow.</h1>
-          <p>Bring the decisions to the places where the work happens.</p>
+          <p>Bring the discussions to the places where the work happens.</p>
         </div>
         <span className="badge green">
           <ShieldCheck size={13} />

@@ -137,7 +137,7 @@ test("named accounts isolate workspace data and credentials, enforce review role
     const update = {
       ...meeting,
       reviewed: true,
-      decisions: meeting.decisions.map((d) => ({ ...d, approved: true })),
+      discussions: meeting.discussions.map((d) => ({ ...d, approved: true })),
     };
     assert.equal(
       (await request("/api/meetings/" + meeting.id, "PUT", update, editor))
@@ -216,7 +216,7 @@ test("named accounts isolate workspace data and credentials, enforce review role
       1,
     );
     const correctionPath = "/api/meetings/" + meeting.id;
-    const add = { kind: "decision", title: "Use a cursor for the audit log", segmentId: "s2", revision: unassigned.revision };
+    const add = { kind: "discussion", title: "Use a cursor for the audit log", segmentId: "s2", revision: unassigned.revision };
     assert.equal((await request(correctionPath, "POST", add, editor)).status, 403);
     assert.equal((await request(correctionPath, "POST", add, viewer)).status, 403);
     assert.equal((await request("/api/meetings/" + foreign.id, "POST", add, reviewer)).status, 404);
@@ -225,9 +225,9 @@ test("named accounts isolate workspace data and credentials, enforce review role
     assert.equal(addedResponse.status, 200, await addedResponse.clone().text());
     const { meeting: added } = await addedResponse.json();
     assert.equal(added.reviewed, false);
-    assert.deepEqual(added.decisions[1].evidence, ["s2"]);
+    assert.deepEqual(added.discussions[1].evidence, ["s2"]);
     assert.equal((await request(correctionPath, "POST", add, reviewer)).status, 409);
-    const merge = { kind: "merge", keepId: added.decisions[0].id, removeId: added.decisions[1].id, revision: added.revision };
+    const merge = { kind: "merge", keepId: added.discussions[0].id, removeId: added.discussions[1].id, revision: added.revision };
     const dbFile = globSync(".wrangler/state/v3/d1/**/*.sqlite").find((path) => !path.endsWith("metadata.sqlite"));
     const database = new DatabaseSync(dbFile);
     try {
@@ -244,7 +244,7 @@ test("named accounts isolate workspace data and credentials, enforce review role
     const mergedResponse = await request(correctionPath, "POST", merge, reviewer);
     assert.equal(mergedResponse.status, 200, await mergedResponse.clone().text());
     const { meeting: merged } = await mergedResponse.json();
-    assert.deepEqual(merged.decisions.map(({ id, evidence, approved }) => ({ id, evidence, approved })), [
+    assert.deepEqual(merged.discussions.map(({ id, evidence, approved }) => ({ id, evidence, approved })), [
       { id: merge.keepId, evidence: ["s1", "s2"], approved: false },
     ]);
     let corrected = merged;

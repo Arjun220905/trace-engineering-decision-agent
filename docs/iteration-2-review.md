@@ -4,7 +4,7 @@ The first iteration had useful meeting review behavior, but route state lived at
 
 ## Changed
 
-- Stable routes for meetings, decisions, actions, integrations, workspace preferences and profile, with canonical meeting/evidence links and a legacy-link redirect.
+- Stable routes for meetings, discussions, actions, integrations, workspace preferences and profile, with canonical meeting/evidence links and a legacy-link redirect.
 - Password access from `app/.env`, initially `6969`, with signed cookies, server-side session revocation, expiry, password-change invalidation and bounded login attempts. No header-based sign-in bypass.
 - Profile details and workspace defaults saved in D1, with revision checks to reject stale saves.
 - Project filtering, persistent sort/filter URLs, meeting order choices, and action priority/owner/deadline sorting.

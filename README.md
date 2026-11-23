@@ -1,6 +1,6 @@
-# Trace · Engineering Decision Agent
+# Trace · Engineering Discussion Agent
 
-Trace turns engineering meetings into decisions, action items, and open questions. Review each draft against its timestamp, then export a decision record or publish approved work to your team’s tools.
+Trace turns engineering meetings into discussions, action items, and open questions. Review each draft against its timestamp, then export an ADR or publish approved work to your team’s tools.
 
 [Quickstart for everyone](quickstart.md) · [Connect your tools](docs/integrations.md) · [Operations](docs/operations.md)
 
@@ -28,7 +28,7 @@ The first start creates an ignored `.env` with a random session secret and appli
 
 ## Connect a tool when you need it
 
-Connect **MeetStream** for meeting bots, transcript imports by ID, and audio playback when the recording is available. Connect **Linear, GitHub, Jira Cloud, or Trello** to publish action items. **Notion** receives decision records, **Slack** receives meeting summaries, and an operator can allow a **signed webhook** destination.
+Connect **MeetStream** for meeting bots, transcript imports by ID, and audio playback when the recording is available. Connect **Linear, GitHub, Jira Cloud, or Trello** to publish action items. **Notion** receives ADRs, **Slack** receives meeting summaries, and an operator can allow a **signed webhook** destination.
 
 Trace uses built-in extraction rules by default. Connecting Claude adds an opt-in extraction mode that sends the selected transcript to Anthropic. Publishing to a connected tool also sends the selected content outside localhost. See [connection setup and what each tool receives](docs/integrations.md).
 
@@ -38,8 +38,11 @@ Trace uses built-in extraction rules by default. Connecting Claude adds an opt-i
 
 | Where | What belongs there |
 | --- | --- |
-| [`app/workspace/`](app/workspace) and [`components/`](components) | Workspace routes and React screens. |
-| [`app/api/`](app/api) | Request validation and workspace permission checks for import, review, integrations, and publishing. |
+| [Workspace routes](app/workspace) and [workspace shell](components/trace-workspace.tsx) | Navigation, workspace data, permissions, and updates shared between screens. |
+| [Meeting list](components/workspace/meeting-list.tsx) and [draft collections](components/workspace/draft-collection.tsx) | Search, filters, sorting, and links to individual meetings. |
+| [Meeting review](components/workspace/meeting-detail.tsx), [recording playback](components/workspace/meeting-recording.tsx), and [draft forms](components/workspace/draft-dialogs.tsx) | Transcript evidence, corrections, and editing. |
+| [Import dialog](components/workspace/import-meeting-dialog.tsx) and [meeting import API](app/api/meetings/route.ts) | Upload, MeetStream bot controls, transcript processing, and duplicate import handling. |
+| [Publish dialog](components/workspace/publish-dialog.tsx), [publish API](app/api/publish/route.ts), and [recovery API](app/api/publish/recover/route.ts) | Approval controls, delivery history, and retries. |
 | [`lib/types.ts`](lib/types.ts), [`lib/extract.ts`](lib/extract.ts), [`lib/review-corrections.ts`](lib/review-corrections.ts) | Shared meeting schema, extraction, and transcript-backed draft corrections. |
 | [`lib/meetstream/`](lib/meetstream) | MeetStream bot lifecycle, transcript imports, and recording access. Bot requests enter through [the bot API](app/api/meetstream/bots/route.ts). |
 | [`lib/integration-service.ts`](lib/integration-service.ts), [`lib/publish.ts`](lib/publish.ts), [`lib/issue-recovery.ts`](lib/issue-recovery.ts) | Workspace connections, outbound delivery, and Linear/GitHub reconciliation. |

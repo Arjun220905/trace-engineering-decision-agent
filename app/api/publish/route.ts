@@ -56,12 +56,12 @@ export async function POST(req: Request) {
         "The meeting changed. Reload and review the latest draft before publishing.",
       );
     const itemIds = p.data.itemIds && new Set(p.data.itemIds);
-    if (itemIds && [...itemIds].some((id) => ![...m.actions, ...m.decisions].some((item) => item.id === id)))
+    if (itemIds && [...itemIds].some((id) => ![...m.actions, ...m.discussions].some((item) => item.id === id)))
       throw new HttpError(400, "A selected draft no longer exists.");
     const publishing = itemIds ? {
       ...m,
       actions: m.actions.filter((item) => itemIds.has(item.id)),
-      decisions: m.decisions.filter((item) => itemIds.has(item.id)),
+      discussions: m.discussions.filter((item) => itemIds.has(item.id)),
     } : m;
     const settings = await db()
       .prepare(

@@ -73,9 +73,9 @@ test("imports native MeetStream participant turns and preserves their evidence",
       { speaker: "Trace Implementer", start: 93.18, end: 115.12 },
     ],
   );
-  const { decisions, actions } = extractRules(segments);
-  assert.equal(decisions[0].title, "Use cursor pagination");
-  assert.deepEqual(decisions[0].evidence, ["s1"]);
+  const { discussions, actions } = extractRules(segments);
+  assert.equal(discussions[0].title, "Use cursor pagination");
+  assert.deepEqual(discussions[0].evidence, ["s1"]);
   assert.equal(actions[0].owner, "Trace Implementer");
   assert.deepEqual(actions[0].evidence, ["s2"]);
 });
@@ -99,7 +99,7 @@ test("rules extract explicit agreements and commitments, deduplicate repeats, le
     "[00:12] Alex: We decided to use cursors.\n[00:25] Alex: We decided to use cursors.\n[01:05] Sarah: I’ll write the specification.\n[01:15] Alex: Should we split the rate limits?",
   );
   const result = extractRules(s);
-  assert.equal(result.decisions.length, 1);
+  assert.equal(result.discussions.length, 1);
   assert.equal(result.actions.length, 1);
   assert.equal(result.actions[0].owner, "Sarah");
   assert.equal(result.actions[0].due, "");
@@ -120,7 +120,7 @@ test("schema rejects fabricated evidence, owners, invalid due dates and duplicat
   }
 });
 test("ADR includes rationale, consequences and exact evidence links", () => {
-  const text = adrMarkdown(m, m.decisions[0], "https://trace.test");
+  const text = adrMarkdown(m, m.discussions[0], "https://trace.test");
   assert.match(text, /## Rationale/);
   assert.match(text, /## Consequences/);
   assert.match(text, /segment=s3/);
@@ -137,10 +137,10 @@ test("Markdown keeps transcript prose literal and preserves generated evidence l
   );
   const draft = structuredClone(m);
   const segment = draft.segments.find(
-    (entry) => entry.id === draft.decisions[0].evidence[0],
+    (entry) => entry.id === draft.discussions[0].evidence[0],
   )!;
   segment.text = "Review [notes] with @team.";
-  const output = adrMarkdown(draft, draft.decisions[0], "https://trace.test");
+  const output = adrMarkdown(draft, draft.discussions[0], "https://trace.test");
   assert.match(output, /Review &#91;notes&#93; with &#64;team&#46;/);
   assert.match(output, /\]\(<https:\/\/trace\.test\/workspace\/meetings\//);
 });
@@ -199,7 +199,7 @@ test("publishing plan includes only approved outputs, once per destination", () 
   const draft = structuredClone(m);
   assert.equal(planDeliveries(draft, ["linear", "slack"]).length, 0);
   draft.actions[0].approved = true;
-  draft.decisions[0].approved = true;
+  draft.discussions[0].approved = true;
   assert.deepEqual(
     planDeliveries(draft, ["linear", "linear", "notion", "slack"]),
     [
@@ -404,7 +404,7 @@ test("AI outputs cannot auto-approve drafts or override meeting identity", async
             text: JSON.stringify({
               id: "malicious",
               summary: "A summary",
-              decisions: [{ ...m.decisions[0], approved: true }],
+              discussions: [{ ...m.discussions[0], approved: true }],
               actions: [{ ...m.actions[0], approved: true, completed: true }],
               questions: [],
             }),
@@ -412,7 +412,7 @@ test("AI outputs cannot auto-approve drafts or override meeting identity", async
         ],
       });
     const result = await extract(m.segments, "test-key");
-    assert.equal(result.decisions[0].approved, false);
+    assert.equal(result.discussions[0].approved, false);
     assert.equal(result.actions[0].approved, false);
     assert.equal(result.actions[0].completed, false);
     assert.equal("id" in result, false);
@@ -425,7 +425,7 @@ test("GitHub verifies assignees; Slack links evidence without accepting mention 
   const original = globalThis.fetch;
   const draft = structuredClone(m);
   draft.actions[0].approved = true;
-  draft.decisions[0].approved = true;
+  draft.discussions[0].approved = true;
   draft.actions[0].title = "Review <!channel> and <@U123> handling";
   try {
     globalThis.fetch = async (url, init) => {
@@ -479,7 +479,7 @@ test("GitHub verifies assignees; Slack links evidence without accepting mention 
       assert.equal(body.parent.page_id, "parent");
       assert.equal(
         body.properties.title.title[0].text.content,
-        draft.decisions[0].title,
+        draft.discussions[0].title,
       );
       assert.match(JSON.stringify(body.children), /## Consequences/);
       return Response.json({ url: "https://notion.so/test-page" });
@@ -548,7 +548,7 @@ test("audio corrections use speaker activity and preserve spoken thanks", async 
 test("webhook delivery signs the original body and rejects tampered or stale requests", async () => {
   const { verifyWebhook } = await import("../lib/webhook.ts");
   const meeting = structuredClone(m);
-  meeting.decisions[0].approved = true;
+  meeting.discussions[0].approved = true;
   const id = crypto.randomUUID();
   const secret = "test-signing-secret-with-more-than-32-characters";
   const oldFetch = globalThis.fetch;
@@ -577,11 +577,11 @@ test("webhook delivery signs the original body and rejects tampered or stale req
       );
       const payload = JSON.parse(raw);
       assert.equal(payload.event, "meeting.reviewed");
-      assert.equal(payload.decisions.length, 1);
+      assert.equal(payload.discussions.length, 1);
       assert.deepEqual(payload.actions, []);
       assert.ok(
         payload.evidence.every((s: { id: string }) =>
-          meeting.decisions[0].evidence.includes(s.id),
+          meeting.discussions[0].evidence.includes(s.id),
         ),
       );
       return new Response(null, { status: 204 });
@@ -708,8 +708,8 @@ test("rules separate settled choices, suggestions, and concrete commitments", ()
     "[00:07] Robin: I will write a load test.",
     "[00:08] Robin: I will not deploy today.",
   ].join("\n"));
-  const { decisions, actions, questions } = extractRules(turns);
-  assert.deepEqual(decisions.map((item) => [item.title, item.evidence]), [["Postgres", ["s3"]]]);
+  const { discussions, actions, questions } = extractRules(turns);
+  assert.deepEqual(discussions.map((item) => [item.title, item.evidence]), [["Postgres", ["s3"]]]);
   assert.deepEqual(actions.map((item) => item.owner), ["Alex", "Robin"]);
   assert.deepEqual(questions, ["Should we use Redis?"]);
 });

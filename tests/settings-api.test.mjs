@@ -81,13 +81,23 @@ test("password gate, revocable sessions, settings, encrypted connection storage 
     assert.ok(!JSON.stringify(initial).includes("APP_SESSION_SECRET"));
     for (const route of [
       "meetings",
-      "decisions",
+      "discussions",
       "actions",
       "integrations",
       "profile",
       "settings",
     ])
       assert.equal((await request(`/workspace/${route}`)).status, 200, route);
+    const legacyCollection = await request("/workspace/decisions?filter=done");
+    assert.equal(legacyCollection.status, 307);
+    assert.equal(new URL(legacyCollection.headers.get("location"), origin).pathname, "/workspace/discussions");
+    assert.equal(new URL(legacyCollection.headers.get("location"), origin).search, "?filter=done");
+    const legacyTab = await request("/workspace/meetings/older-meeting?tab=decisions&segment=s3");
+    assert.equal(legacyTab.status, 307);
+    const redirected = new URL(legacyTab.headers.get("location"), origin);
+    assert.equal(redirected.pathname, "/workspace/meetings/older-meeting");
+    assert.equal(redirected.searchParams.get("tab"), "discussions");
+    assert.equal(redirected.searchParams.get("segment"), "s3");
     const saved = await request("/api/preferences", "PUT", {
       ...initial.preferences,
       displayName: "Profile test",

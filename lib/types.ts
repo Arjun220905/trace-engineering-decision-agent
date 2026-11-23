@@ -11,7 +11,7 @@ export const segmentSchema = z
     text: z.string().min(1).max(12000),
   })
   .refine((s) => s.end >= s.start, "End must follow start");
-export const decisionSchema = z.object({
+export const discussionSchema = z.object({
   id: z.string().min(1).max(100),
   title: z.string().min(1).max(300),
   context: z.string().max(4000),
@@ -59,7 +59,7 @@ export const meetingSchema = z
     duration: z.number().finite().min(0).max(604800),
     summary: z.string().max(8000),
     segments: z.array(segmentSchema).min(1).max(5000),
-    decisions: z.array(decisionSchema).max(100),
+    discussions: z.array(discussionSchema).max(100),
     actions: z.array(actionSchema).max(200),
     questions: z.array(z.string().max(1000)).max(100),
     source: z.enum(["sample", "import", "meetstream"]),
@@ -71,10 +71,10 @@ export const meetingSchema = z
     const ids = new Set(m.segments.map((s) => s.id));
     if (ids.size !== m.segments.length)
       ctx.addIssue({ code: "custom", message: "Segment IDs must be unique" });
-    const outputIds = [...m.decisions, ...m.actions].map((x) => x.id);
+    const outputIds = [...m.discussions, ...m.actions].map((x) => x.id);
     if (new Set(outputIds).size !== outputIds.length)
       ctx.addIssue({ code: "custom", message: "Output IDs must be unique" });
-    for (const item of [...m.decisions, ...m.actions]) {
+    for (const item of [...m.discussions, ...m.actions]) {
       if (item.evidence.some((id) => !ids.has(id)))
         ctx.addIssue({
           code: "custom",
@@ -93,11 +93,21 @@ export const meetingSchema = z
   });
 export const extractionSchema = z.object({
   summary: z.string().max(8000),
-  decisions: z.array(decisionSchema).max(100),
+  discussions: z.array(discussionSchema).max(100),
   actions: z.array(actionSchema).max(200),
   questions: z.array(z.string().max(1000)).max(100),
 });
 export type Meeting = z.infer<typeof meetingSchema>;
+// Older stored meetings used the previous name. Keep their IDs and review data.
+export function readStoredMeeting(data: string, revision: number): Meeting {
+  const { decisions, ...meeting } = JSON.parse(data);
+  return meetingSchema.parse({
+    ...meeting,
+    discussions: meeting.discussions ?? decisions,
+    revision,
+  });
+}
+
 export type Segment = z.infer<typeof segmentSchema>;
 export type MeetingPreview = Omit<Meeting, "segments"> & {
   turns: Pick<Segment, "id" | "speaker" | "start">[];
@@ -110,7 +120,7 @@ export function meetingPreview({ segments, ...meeting }: Meeting): MeetingPrevie
   };
 }
 
-export type Decision = z.infer<typeof decisionSchema>;
+export type Discussion = z.infer<typeof discussionSchema>;
 export type Action = z.infer<typeof actionSchema>;
 export const destinations = ["linear", "github", "jira", "trello", "slack", "notion", "webhook"] as const;
 export type Destination = (typeof destinations)[number];
@@ -171,23 +181,23 @@ export function markdownEvidence(
 }
 export function adrMarkdown(
   m: Meeting,
-  d: Decision,
+  d: Discussion,
   origin: string,
   format = literalMarkdown,
 ) {
-  return `# ${format(d.title)}\n\nStatus: ${d.approved ? "Accepted" : "Proposed"}\nDate: ${m.date.slice(0, 10)}\nMeeting: ${format(m.title)}\n\n## Context\n${format(d.context)}\n\n## Decision\n${format(d.title)}\n\n## Rationale\n${format(d.rationale)}\n\n## Consequences\n${format(d.consequences)}\n\n## Evidence\n${d.evidence
+  return `# ${format(d.title)}\n\nStatus: ${d.approved ? "Accepted" : "Proposed"}\nDate: ${m.date.slice(0, 10)}\nMeeting: ${format(m.title)}\n\n## Context\n${format(d.context)}\n\n## Outcome\n${format(d.title)}\n\n## Rationale\n${format(d.rationale)}\n\n## Consequences\n${format(d.consequences)}\n\n## Evidence\n${d.evidence
     .map((id) => markdownEvidence(origin, m, id, format))
     .join("\n")}\n`;
 }
 export function summaryMarkdown(m: Meeting, origin: string) {
-  return `# ${literalMarkdown(m.title)}\n\n${literalMarkdown(m.summary)}\n\n## Decisions\n${
-    m.decisions
+  return `# ${literalMarkdown(m.title)}\n\n${literalMarkdown(m.summary)}\n\n## Discussions\n${
+    m.discussions
       .filter((d) => d.approved)
       .map(
         (d) =>
           `- ${literalMarkdown(d.title)} ([evidence](<${evidenceUrl(origin, m, d.evidence[0])}>))`,
       )
-      .join("\n") || "No approved decisions."
+      .join("\n") || "No approved discussions."
   }\n\n## Action items\n${
     m.actions
       .filter((a) => a.approved)

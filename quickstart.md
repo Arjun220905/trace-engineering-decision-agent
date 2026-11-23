@@ -28,18 +28,18 @@ You can also use **Send bot to meeting** to send **Trace Notetaker** to a call o
 
 | Section | What it’s for |
 | --- | --- |
-| **Decisions** | Choices the team agreed on. Open **View ADR draft** to see an architecture decision record, a short write-up of the choice, its reasons, and its consequences. |
+| **Discussions** | Choices the team agreed on. Open **View ADR draft** to see an architecture decision record, a short write-up of the choice, its reasons, and its consequences. |
 | **Action items** | Follow-up work. Confirm who agreed to do it and add a due date if you know it. |
 | **Open questions** | Things the group still needs to answer. |
 
 Click a timestamp to jump to the words behind a draft. Reviewers can also play the audio when a linked MeetStream recording is still available. Use **Review this turn** in the transcript to add a missed draft or correct a speaker.
 
-The default extraction runs on your computer and looks for statements such as “we decided” or “I’ll do it.” A discussion may produce no decisions if nobody clearly agreed on a choice. Check the drafts for missed commitments and wording before approving them. If you explicitly enable Claude for an import, Trace sends that transcript to Anthropic for extraction.
+The default extraction runs on your computer and looks for statements such as “we decided” or “I’ll do it.” A meeting may produce no discussion drafts if nobody clearly agreed on a choice. Check the drafts for missed commitments and wording before approving them. If you explicitly enable Claude for an import, Trace sends that transcript to Anthropic for extraction.
 
 ## Export or publish
 
-- **Keep a copy.** Use **Export meeting** for the meeting notes, or **View ADR draft → Download ADR** to save an individual decision.
-- **Send approved work.** With a Reviewer or Admin account, approve the drafts you want, then choose **Publish outputs** and pick a connected destination. You can also publish a single draft directly from **Decisions** or **Action items**. The action checkbox tracks whether the work is finished. The **Approve** control selects what can be published.
+- **Keep a copy.** Use **Export meeting** for the meeting notes, or **View ADR draft → Download ADR** to save an individual discussion.
+- **Send approved work.** With a Reviewer or Admin account, approve the drafts you want, then choose **Publish outputs** and pick a connected destination. You can also publish a single draft directly from **Discussions** or **Action items**. The action checkbox tracks whether the work is finished. The **Approve** control selects what can be published.
 - **Assign an issue later.** If Trace has no account mapping for the action owner, it includes the owner’s name in the description. Open the issue or card to assign it in the destination. Connectors are optional and an admin sets them up under **Integrations**. [Connection instructions](docs/integrations.md)
 - **Follow an issue across meetings.** Say the task name or Linear issue ID and what changed. Review the proposed status beside the transcript timestamp, then publish it to update that issue. [Linear follow-ups](docs/integrations.md#follow-the-same-issue-across-meetings)
 - **Check uncertain sends.** Look in the meeting’s **Activity** before trying again. Trace can check Linear or GitHub for an existing issue. For other tools, verify the result in the destination.

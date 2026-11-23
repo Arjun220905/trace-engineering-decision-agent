@@ -94,7 +94,7 @@ export async function githubOptions(
     Authorization: `Bearer ${c.token}`,
     Accept: "application/vnd.github+json",
     "X-GitHub-Api-Version": "2022-11-28",
-    "User-Agent": "Trace-Decision-Agent",
+    "User-Agent": "Trace-Discussion-Agent",
   };
   const [repo, account] = await Promise.all([
     providerRead(`https://api.github.com/repos/${c.repository}`, headers),

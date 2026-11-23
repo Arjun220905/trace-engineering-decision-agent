@@ -12,17 +12,25 @@ export default async function WorkspacePage({
 }) {
   const { path } = await params;
   const pathname = canonicalWorkspacePath(path);
+  let needsRedirect = path?.[0] === "decisions";
   if (!workspaceRoute(pathname)) notFound();
   const search = await searchParams;
   const query = new URLSearchParams();
-  for (const [key, value] of Object.entries(search))
-    if (typeof value === "string") query.set(key, value);
+  for (const [key, value] of Object.entries(search)) {
+    for (const item of Array.isArray(value) ? value : value === undefined ? [] : [value]) {
+      const legacyTab = key === "tab" && item === "decisions";
+      query.append(key, legacyTab ? "discussions" : item);
+      if (legacyTab) needsRedirect = true;
+    }
+  }
+  const target = pathname + (query.size ? `?${query}` : "");
+  if (needsRedirect) redirect(target);
   try {
     await sessionUser((await headers()).get("cookie"));
   } catch (e) {
     if (e instanceof HttpError && (e.status === 401 || e.status === 503))
       redirect(
-        `/login?next=${encodeURIComponent(pathname + (query.size ? `?${query}` : ""))}`,
+        `/login?next=${encodeURIComponent(target)}`,
       );
     throw e;
   }

@@ -4,7 +4,7 @@ import { HttpError } from "./errors";
 import { readSessionCookie, verifySession } from "./auth";
 import { env } from "cloudflare:workers";
 import {
-  meetingSchema,
+  readStoredMeeting,
   type Meeting,
   type IntegrationStatus,
   type Delivery,
@@ -182,10 +182,7 @@ export async function getMeeting(owner: string, id: string): Promise<Meeting> {
     .bind(owner, id)
     .first<{ data: string; revision: number }>();
   if (!row) throw new HttpError(404, "Meeting not found.");
-  return meetingSchema.parse({
-    ...JSON.parse(row.data),
-    revision: row.revision,
-  });
+  return readStoredMeeting(row.data, row.revision);
 }
 export async function getDeliveries(owner: string): Promise<Delivery[]> {
   const rows = await db()

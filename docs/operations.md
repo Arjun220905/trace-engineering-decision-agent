@@ -18,7 +18,7 @@ The audit log records sign-in, sign-out, account changes, imports, review change
 
 The server operator sets `TRACE_WEBHOOK_ENDPOINTS` to a JSON object mapping workspace IDs to arrays of exact trusted HTTPS endpoints. Treat these as trusted servers and check where the hostname resolves. In Integrations, configure Signed webhook with an allowed URL and a shared secret of at least 32 characters. The app encrypts the signing secret and sends approved outputs only when a reviewer selects this destination. Redirect responses fail delivery.
 
-Verify `X-Trace-Signature` before parsing the request body. `verifyWebhook` in `lib/webhook.ts` checks HMAC-SHA256 over `deliveryId.timestamp.rawBody`, rejects invalid signatures, and enforces a five-minute time window. The delivery ID and timestamp are in `X-Trace-Delivery` and `X-Trace-Timestamp`. Atomically record each verified delivery ID with the receiver’s processing intent and retain it through the signed timestamp plus five minutes. The event type is `meeting.reviewed`. A successful response is any 2xx status.
+Verify `X-Trace-Signature` before parsing the request body. `verifyWebhook` in `lib/webhook.ts` checks HMAC-SHA256 over `deliveryId.timestamp.rawBody`, rejects invalid signatures, and enforces a five-minute time window. The delivery ID and timestamp are in `X-Trace-Delivery` and `X-Trace-Timestamp`. Atomically record each verified delivery ID with the receiver’s processing intent and retain it through the signed timestamp plus five minutes. The event type is `meeting.reviewed`. The approved discussion drafts are in the `discussions` array. Existing receivers that read the old field name should switch to `discussions`. A successful response is any 2xx status.
 
 ## Schema updates
 

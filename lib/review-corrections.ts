@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { HttpError } from "./errors.ts";
-import { meetingSchema, type Action, type Decision, type Meeting } from "./types.ts";
+import { meetingSchema, type Action, type Discussion, type Meeting } from "./types.ts";
 
 const itemId = z.string().min(1).max(100);
 const title = z.string().trim().min(1).max(300);
 export const correctionSchema = z.discriminatedUnion("kind", [
-  z.object({ kind: z.literal("decision"), segmentId: itemId, title }),
+  z.object({ kind: z.literal("discussion"), segmentId: itemId, title }),
   z.object({ kind: z.literal("action"), segmentId: itemId, title, owner: z.string().trim().max(120) }),
   z.object({ kind: z.literal("speaker"), segmentId: itemId, speaker: z.string().trim().min(1).max(120) }),
   z.object({ kind: z.literal("merge"), keepId: itemId, removeId: itemId }),
@@ -16,7 +16,7 @@ export function correctMeeting(meeting: Meeting, correction: Correction): Meetin
   let next = { ...meeting, reviewed: false };
   if (correction.kind === "merge") {
     const { keepId, removeId } = correction;
-    function merge<T extends Action | Decision>(items: T[]) {
+    function merge<T extends Action | Discussion>(items: T[]) {
       const keep = items.find((item) => item.id === keepId);
       const remove = items.find((item) => item.id === removeId);
       if (!keep || !remove || keepId === removeId) return null;
@@ -29,11 +29,11 @@ export function correctMeeting(meeting: Meeting, correction: Correction): Meetin
         item.id === keepId ? { ...item, evidence, approved: false } : item,
       );
     }
-    const decisions = merge(meeting.decisions);
+    const discussions = merge(meeting.discussions);
     const actions = merge(meeting.actions);
-    if (!decisions && !actions)
+    if (!discussions && !actions)
       throw new HttpError(400, "Choose two different drafts of the same kind.");
-    next = { ...next, decisions: decisions ?? meeting.decisions, actions: actions ?? meeting.actions };
+    next = { ...next, discussions: discussions ?? meeting.discussions, actions: actions ?? meeting.actions };
   } else {
     const turn = meeting.segments.find((item) => item.id === correction.segmentId);
     if (!turn) throw new HttpError(404, "Transcript turn not found.");
@@ -47,7 +47,7 @@ export function correctMeeting(meeting: Meeting, correction: Correction): Meetin
           ...[...(turn.previousSpeakers ?? []), turn.speaker].filter((name) => owners.has(name)),
         ]),
       ];
-      const reopen = <T extends Action | Decision>(items: T[]) =>
+      const reopen = <T extends Action | Discussion>(items: T[]) =>
         items.map((item) => item.evidence.includes(turn.id) ? { ...item, approved: false } : item);
       next.segments = meeting.segments.map((item) => item.id === turn.id ? {
         ...item,
@@ -55,7 +55,7 @@ export function correctMeeting(meeting: Meeting, correction: Correction): Meetin
         previousSpeakers,
       } : item);
       next.actions = reopen(meeting.actions);
-      next.decisions = reopen(meeting.decisions);
+      next.discussions = reopen(meeting.discussions);
     } else {
       const draft = {
         id: crypto.randomUUID(),
@@ -64,8 +64,8 @@ export function correctMeeting(meeting: Meeting, correction: Correction): Meetin
         approved: false,
       };
       const excerpt = turn.text.slice(0, 4000);
-      if (correction.kind === "decision")
-        next.decisions = [...meeting.decisions, { ...draft, context: excerpt, rationale: "", consequences: "" }];
+      if (correction.kind === "discussion")
+        next.discussions = [...meeting.discussions, { ...draft, context: excerpt, rationale: "", consequences: "" }];
       else {
         if (correction.owner && !meeting.segments.some((item) => item.speaker === correction.owner))
           throw new HttpError(400, "Choose a current meeting participant as the owner.");

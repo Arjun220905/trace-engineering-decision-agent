@@ -10,7 +10,7 @@ export const integrationCatalog = [
   {
     id: "github",
     name: "GitHub",
-    description: "Keep decisions and owned work close to the code.",
+    description: "Keep discussions and owned work close to the code.",
     tag: "Development",
     url: "https://github.com/settings/personal-access-tokens",
     help: "Use a token with Issues write access, then enter the repository as owner/name.",
@@ -42,7 +42,7 @@ export const integrationCatalog = [
   {
     id: "webhook",
     name: "Signed webhook",
-    description: "Deliver approved decisions and tasks to your system.",
+    description: "Deliver approved discussions and tasks to your system.",
     tag: "Automation",
     url: "/workspace/settings",
     help: "Use an endpoint allowed for this workspace and a shared secret of at least 32 characters.",
@@ -66,10 +66,10 @@ export const integrationCatalog = [
   {
     id: "ai",
     name: "Claude",
-    description: "Extract contextual decisions and commitments with Claude.",
+    description: "Extract contextual discussions and commitments with Claude.",
     tag: "Intelligence",
     url: "https://console.anthropic.com/",
-    help: "Paste your Anthropic key. Explicit decision extraction also works without AI.",
+    help: "Paste your Anthropic key. Explicit discussion extraction also works without AI.",
   },
 ] as const;
 export type IntegrationId = (typeof integrationCatalog)[number]["id"];
